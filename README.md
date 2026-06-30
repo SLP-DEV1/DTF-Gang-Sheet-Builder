@@ -22,9 +22,9 @@ Alles laeuft lokal im Browser, ohne Backend, externe Uploads, Datenbank oder API
 - Kollisions-, Rand-, Ueberlappungs- und Mindestabstands-Pruefung
 - Optionale rote/orange Markierung betroffener Motive im Canvas
 - Optionale Abstandslinien und Schneidelinien im Canvas und optional im Export
-- Preisrechner fuer Flaeche, Arbeitszeit, Stundensatz, Marge, Mindestpreis und empfohlenen Verkaufspreis
+- Preisrechner in Euro fuer Flaeche, Arbeitszeit, Stundensatz, Marge, Mindestpreis und empfohlenen Verkaufspreis
 - Preis pro Motivgruppe und Preis pro Stueck
-- Grobe Verbrauchsberechnung fuer Folie, Pulver und Tinte
+- Grobe Verbrauchsberechnung in Euro: Folie nach Sheet-Laenge, Pulver und Tinte nach belegter Motivflaeche
 - White-Underbase-Vorschau als reine Anzeigehilfe
 - Export-Sicherheitsanzeige mit Pixelgroesse, Megapixeln und geschaetztem RAM-Verbrauch
 - Warnung bei sehr grossen Exporten ueber 150 Megapixel

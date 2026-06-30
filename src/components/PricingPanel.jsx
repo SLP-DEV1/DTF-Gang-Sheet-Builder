@@ -1,8 +1,17 @@
 import { calculateGroupPricing, calculatePricing } from '../lib/pricing.js';
 
-function money(value) {
-  return Number(value).toFixed(2);
-}
+const euro = new Intl.NumberFormat('de-DE', {
+  style: 'currency',
+  currency: 'EUR',
+});
+
+const PRACTICAL_PRICING_VALUES = {
+  pricePerCm2: 0.018,
+  laborMinutes: 3,
+  hourlyRate: 35,
+  marginPercent: 20,
+  minimumPrice: 0,
+};
 
 export default function PricingPanel({ items, groups, sheet, values, onChange }) {
   const result = calculatePricing({ items, sheet, ...values });
@@ -12,7 +21,7 @@ export default function PricingPanel({ items, groups, sheet, values, onChange })
     <section className="panel">
       <h2>Preisrechner</h2>
       <label className="field">
-        <span>Preis pro cm2</span>
+        <span>Verkaufspreis pro cm2 (€)</span>
         <input
           type="number"
           min="0"
@@ -21,6 +30,9 @@ export default function PricingPanel({ items, groups, sheet, values, onChange })
           onChange={(event) => onChange({ pricePerCm2: Number(event.target.value) })}
         />
       </label>
+      <button className="button secondary full" type="button" onClick={() => onChange(PRACTICAL_PRICING_VALUES)}>
+        Praxiswerte einsetzen
+      </button>
       <label className="field compact-field">
         <span>Arbeitszeit Minuten</span>
         <input
@@ -75,32 +87,36 @@ export default function PricingPanel({ items, groups, sheet, values, onChange })
           <dd>{result.utilizationPercent.toFixed(1)}%</dd>
         </div>
         <div>
-          <dt>Preis Motive</dt>
-          <dd>{money(result.occupiedPrice)}</dd>
+          <dt>Motivpreis</dt>
+          <dd>{euro.format(result.occupiedPrice)}</dd>
         </div>
         <div>
           <dt>Komplettes Sheet</dt>
-          <dd>{money(result.fullSheetPrice)}</dd>
+          <dd>{euro.format(result.fullSheetPrice)}</dd>
         </div>
         <div>
           <dt>Arbeitskosten</dt>
-          <dd>{money(result.laborPrice)}</dd>
+          <dd>{euro.format(result.laborPrice)}</dd>
         </div>
         <div>
           <dt>Mindestpreis</dt>
-          <dd>{money(values.minimumPrice)}</dd>
+          <dd>{euro.format(values.minimumPrice)}</dd>
         </div>
         <div>
           <dt>Empf. Verkaufspreis</dt>
-          <dd>{money(result.recommendedPrice)}</dd>
+          <dd>{euro.format(result.recommendedPrice)}</dd>
         </div>
       </dl>
+      <p className="meta small">
+        Praxisnaher Startwert: niedriger cm2-Preis plus kurze Ruestzeit. Passe Stundensatz,
+        Marge und Mindestpreis an deinen Betrieb an.
+      </p>
       {groupPricing.length ? (
         <div className="mini-table">
           {groupPricing.map((group) => (
             <div key={group.key}>
               <span>{group.name}</span>
-              <strong>{money(group.groupPrice)} / {money(group.unitPrice)} Stk.</strong>
+              <strong>{euro.format(group.groupPrice)} / {euro.format(group.unitPrice)} Stk.</strong>
             </div>
           ))}
         </div>

@@ -37,20 +37,20 @@ const initialSettings = {
 };
 
 const initialPricing = {
-  pricePerCm2: 0.05,
-  laborMinutes: 10,
-  hourlyRate: 45,
-  marginPercent: 30,
-  minimumPrice: 15,
+  pricePerCm2: 0.018,
+  laborMinutes: 3,
+  hourlyRate: 35,
+  marginPercent: 20,
+  minimumPrice: 0,
 };
 
 const initialConsumption = {
-  foilPricePerMeter: 4,
+  foilPricePerMeter: 2.6,
   rollWidthCm: 56,
-  powderGramsPerM2: 20,
-  powderPricePerKg: 18,
-  inkMlPerM2: 12,
-  inkPricePerLiter: 85,
+  powderGramsPerM2: 18,
+  powderPricePerKg: 14,
+  inkMlPerM2: 10,
+  inkPricePerLiter: 55,
 };
 
 const initialGuideSettings = {
@@ -382,7 +382,7 @@ export default function App() {
       };
     }),
     pricing: calculatePricing({ items, sheet: settings, ...pricingValues }),
-    consumption: calculateConsumption({ sheet: settings, values: consumptionValues }),
+    consumption: calculateConsumption({ sheet: settings, values: consumptionValues, items }),
   });
 
   const saveProject = () => {
@@ -653,6 +653,7 @@ export default function App() {
           />
           <ConsumptionPanel
             sheet={settings}
+            items={items}
             values={consumptionValues}
             onChange={(patch) => setConsumptionValues((current) => ({ ...current, ...patch }))}
           />
