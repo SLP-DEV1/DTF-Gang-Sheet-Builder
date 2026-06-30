@@ -19,7 +19,7 @@ export default function UploadPanel({
         onDrop={handleDrop}
       >
         <input type="file" accept="image/png" multiple onChange={onUpload} />
-        <span>PNG-Dateien auswaehlen oder hier ablegen</span>
+        <span>PNG-Dateien auswählen oder hier ablegen</span>
       </label>
       <div className="button-row">
         <label className="button file-button">
@@ -31,7 +31,7 @@ export default function UploadPanel({
         </button>
       </div>
       <button className="button secondary full" type="button" onClick={onClearAutosave}>
-        Autosave loeschen
+        Autosave löschen
       </button>
     </section>
   );

@@ -49,7 +49,7 @@ export default function MotifList({
                 </label>
                 <div className="button-row compact-buttons">
                   <button className="button secondary" type="button" onClick={() => onSelect(item.id)}>
-                    Auswaehlen
+                    Auswählen
                   </button>
                   <button className="button secondary" type="button" onClick={() => onDuplicate(item.id)}>
                     Duplizieren
@@ -60,10 +60,10 @@ export default function MotifList({
                     </button>
                   )}
                   <button className="button danger" type="button" onClick={() => onDelete(item.id)}>
-                    Loeschen
+                    Löschen
                   </button>
                   <button className="button danger" type="button" onClick={() => onDeleteGroup(group.key)}>
-                    Alle loeschen
+                    Alle löschen
                   </button>
                 </div>
               </article>

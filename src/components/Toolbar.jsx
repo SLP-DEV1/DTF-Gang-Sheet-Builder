@@ -39,7 +39,7 @@ export default function Toolbar({
           checked={sortBySize}
           onChange={(event) => onSortBySizeChange(event.target.checked)}
         />
-        <span>Nach Groesse sortieren</span>
+        <span>Nach Größe sortieren</span>
       </label>
       <label className="toggle-line">
         <input

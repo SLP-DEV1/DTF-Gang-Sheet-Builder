@@ -75,23 +75,23 @@ export default function PricingPanel({ items, groups, sheet, values, onChange })
       </label>
       <dl className="result-list">
         <div>
-          <dt>Umriss-Flaeche (Bounding Box)</dt>
+          <dt>Umriss-Fläche (Bounding Box)</dt>
           <dd>{result.occupiedAreaCm2.toFixed(2)} cm2</dd>
         </div>
         {result.alphaPrintedAreaCm2 !== undefined && result.alphaPrintedAreaCm2 !== result.occupiedAreaCm2 ? (
           <div>
-            <dt>Tatsaechliche Druckflaeche (Alpha)</dt>
+            <dt>Tatsächliche Druckfläche (Alpha)</dt>
             <dd>
               {result.alphaPrintedAreaCm2.toFixed(2)} cm2
               {' '}
               <span className="meta small">
-                ({((result.alphaPrintedAreaCm2 / result.occupiedAreaCm2) * 100).toFixed(0)}% der Umrissflaeche)
+                ({((result.alphaPrintedAreaCm2 / result.occupiedAreaCm2) * 100).toFixed(0)}% der Umrissfläche)
               </span>
             </dd>
           </div>
         ) : null}
         <div>
-          <dt>Sheet-Flaeche</dt>
+          <dt>Sheet-Fläche</dt>
           <dd>{result.sheetAreaCm2.toFixed(2)} cm2</dd>
         </div>
         <div>
@@ -126,7 +126,7 @@ export default function PricingPanel({ items, groups, sheet, values, onChange })
         </div>
       </dl>
       <p className="meta small">
-        Praxisnaher Startwert: niedriger cm2-Preis plus kurze Ruestzeit. Passe Stundensatz,
+        Praxisnaher Startwert: niedriger cm2-Preis plus kurze Rüstzeit. Passe Stundensatz,
         Marge und Mindestpreis an deinen Betrieb an.
       </p>
       {groupPricing.length ? (

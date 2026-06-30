@@ -1,3 +1,12 @@
+const SIZE_PRESETS = [
+  { label: 'Brust klein', widthCm: 8 },
+  { label: 'Brust normal', widthCm: 10 },
+  { label: 'Ärmel', widthCm: 7 },
+  { label: 'Kinder-Shirt', widthCm: 18 },
+  { label: 'Rücken groß', widthCm: 28 },
+  { label: 'A4 Breite', widthCm: 21 },
+];
+
 export default function ExportPanel({
   selectedItem,
   selectedSizeCm,
@@ -42,7 +51,7 @@ export default function ExportPanel({
               />
             </label>
             <label className="field">
-              <span>Hoehe cm</span>
+              <span>Höhe cm</span>
               <input
                 type="number"
                 min="0.1"
@@ -57,8 +66,20 @@ export default function ExportPanel({
                 checked={aspectUnlocked}
                 onChange={(event) => onAspectUnlockedChange(event.target.checked)}
               />
-              <span>Seitenverhaeltnis entsperren</span>
+              <span>Seitenverhältnis entsperren</span>
             </label>
+            <div className="preset-grid" aria-label="Motivgrößen-Presets">
+              {SIZE_PRESETS.map((preset) => (
+                <button
+                  className="button secondary small-button"
+                  type="button"
+                  key={preset.label}
+                  onClick={() => onUpdateSelectedSizeCm({ widthCm: preset.widthCm })}
+                >
+                  {preset.label} · {preset.widthCm} cm
+                </button>
+              ))}
+            </div>
             <div className="button-row">
               <button className="button secondary" type="button" onClick={onDuplicate}>
                 Duplizieren
@@ -84,7 +105,7 @@ export default function ExportPanel({
           <span>White Underbase Vorschau</span>
         </label>
         <p className="meta small">
-          White-Underbase ist nur Vorschau. Die echte Weissunterlegung macht normalerweise das RIP.
+          White-Underbase ist nur Vorschau. Die echte Weißunterlegung macht normalerweise das RIP.
         </p>
       </section>
 

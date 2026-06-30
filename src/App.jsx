@@ -7,6 +7,7 @@ import ExportSafetyPanel from './components/ExportSafetyPanel.jsx';
 import MotifList from './components/MotifList.jsx';
 import MultiSelectPanel from './components/MultiSelectPanel.jsx';
 import PlacementWarnings from './components/PlacementWarnings.jsx';
+import QuickStartPanel from './components/QuickStartPanel.jsx';
 import PricingPanel from './components/PricingPanel.jsx';
 import SheetSettings from './components/SheetSettings.jsx';
 import TemplateSelector, { TEMPLATES } from './components/TemplateSelector.jsx';
@@ -228,7 +229,7 @@ export default function App() {
     const unsupported = fileList.filter((file) => file.type !== 'image/png');
     const pngFiles = fileList.filter((file) => file.type === 'image/png');
     if (pngFiles.length === 0) {
-      if (unsupported.length) setStatus('Nur PNG-Dateien werden unterstuetzt.');
+      if (unsupported.length) setStatus('Nur PNG-Dateien werden unterstützt.');
       return;
     }
 
@@ -274,7 +275,7 @@ export default function App() {
     applyItemsChange((current) => [...current, ...loaded.map(({ item }) => item)], false);
     setSelectedIds([loaded[loaded.length - 1].item.id]);
     const messages = [`${loaded.length} PNG-Datei(en) geladen.`];
-    if (unsupported.length) messages.push(`${unsupported.length} Datei(en) uebersprungen.`);
+    if (unsupported.length) messages.push(`${unsupported.length} Datei(en) übersprungen.`);
     if (transparencyWarnings.length) messages.push(`Warnung: ${transparencyWarnings.join(', ')} hat keine Transparenz.`);
     setStatus(messages.join(' '));
   }, []);
@@ -434,17 +435,54 @@ export default function App() {
   };
 
   const arrangeItems = () => {
-    const result = autoPackItemsWithOptions(items, sheet, gapMm, {
+    if (!sheetItems.length) {
+      setArrangeWarning('Keine Motive auf dem aktuellen Sheet.');
+      return;
+    }
+
+    const packOptions = {
       allowRotation: allowPackingRotation,
       sortBySize: sortPackingBySize,
+    };
+    const pages = packItemsAcrossSheets(sheetItems, sheet, gapMm, packOptions);
+    const currentItemsSnapshot = items;
+    pushHistory(currentItemsSnapshot);
+
+    if (pages.length <= 1) {
+      const packedById = new Map(pages[0].items.map((item) => [item.id, { ...item, sheetId: activeSheetId }]));
+      setItems((current) => current.map((item) => packedById.get(item.id) || item));
+      const utilization = `Auslastung: ${pages[0].beforeUtilization.toFixed(1)}% -> ${pages[0].afterUtilization.toFixed(1)}%.`;
+      setArrangeWarning(utilization);
+      return;
+    }
+
+    const overflowSheets = pages.slice(1).map((page, index) => ({
+      id: makeId(),
+      name: `${activeSheet.name || 'Sheet'} ${index + 2}`,
+      widthCm: activeSheet.widthCm,
+      heightCm: activeSheet.heightCm,
+      dpi: activeSheet.dpi,
+      page,
+    }));
+    const sheetIds = [activeSheetId, ...overflowSheets.map((entry) => entry.id)];
+    const packedById = new Map();
+
+    pages.forEach((page, pageIndex) => {
+      page.items.forEach((item) => {
+        packedById.set(item.id, { ...item, sheetId: sheetIds[pageIndex] });
+      });
     });
-    applyItemsChange(result.items);
-    const utilization = `Auslastung: ${result.beforeUtilization.toFixed(1)}% -> ${result.afterUtilization.toFixed(1)}%.`;
-    setArrangeWarning(
-      result.overflow
-        ? `${utilization} Nicht alle Motive passen auf dieses Sheet. Vorbereitet fuer ca. ${result.sheetsNeededEstimate} Sheets.`
-        : utilization,
-    );
+
+    setItems((current) => current.map((item) => packedById.get(item.id) || item));
+    setSheets((current) => [
+      ...current,
+      ...overflowSheets.map(({ page, ...sheetInfo }) => sheetInfo),
+    ]);
+
+    const totalUtilization = pages
+      .map((page, index) => `Sheet ${index + 1}: ${page.afterUtilization.toFixed(1)}%`)
+      .join(', ');
+    setArrangeWarning(`Auf ${pages.length} Sheets verteilt. ${totalUtilization}.`);
   };
 
   const runExport = (callback) => {
@@ -519,45 +557,103 @@ export default function App() {
       guideSettings,
     });
 
-  const makeSummary = () => ({
-    sheet: activeSheet,
-    export: exportStats,
-    placement: { issueCount: placementResult.issues.length, summary: placementResult.summary },
-    motifs: motifGroups.map((group) => {
-      const item = group.items[0];
-      return {
-        name: item.name,
-        quantity: group.items.length,
-        sizeCm: getItemPrintedSizeCm(item, activeSheet.dpi),
-        rotation: item.rotation,
-        quality: calculateEffectiveDpi(item, activeSheet.dpi),
-      };
-    }),
-    pricing: calculatePricing({ items: sheetItems, sheet: activeSheet, ...pricingValues }),
-    consumption: calculateConsumption({ sheet: activeSheet, values: consumptionValues, items: sheetItems }),
-  });
+  const makeSheetSummary = (targetSheet) => {
+    const targetItems = items.filter((item) => item.sheetId === targetSheet.id);
+    const targetSheetWithPixels = {
+      ...targetSheet,
+      widthPx: cmToPx(targetSheet.widthCm, targetSheet.dpi),
+      heightPx: cmToPx(targetSheet.heightCm, targetSheet.dpi),
+    };
+    const groups = groupItems(targetItems);
+    const placement = checkPlacement(targetItems, targetSheetWithPixels, gapMm);
+
+    return {
+      id: targetSheet.id,
+      name: targetSheet.name,
+      sheet: targetSheet,
+      export: getExportStats(targetSheetWithPixels),
+      placement: { issueCount: placement.issues.length, summary: placement.summary },
+      motifs: groups.map((group) => {
+        const item = group.items[0];
+        return {
+          name: item.name,
+          quantity: group.items.length,
+          sizeCm: getItemPrintedSizeCm(item, targetSheet.dpi),
+          rotation: item.rotation,
+          quality: calculateEffectiveDpi(item, targetSheet.dpi),
+        };
+      }),
+      pricing: calculatePricing({ items: targetItems, sheet: targetSheet, ...pricingValues }),
+      consumption: calculateConsumption({ sheet: targetSheet, values: consumptionValues, items: targetItems }),
+    };
+  };
+
+  const makeSummary = () => makeSheetSummary(activeSheet);
+
+  const makeProjectSummary = () => {
+    const sheetSummaries = sheets.map((entry) => makeSheetSummary(entry));
+    return {
+      type: 'project',
+      generatedAt: new Date().toISOString(),
+      sheetCount: sheets.length,
+      activeSheetId,
+      sheets: sheetSummaries,
+      totals: {
+        motifCount: sheetSummaries.reduce((sum, entry) => sum + entry.motifs.reduce((count, motif) => count + motif.quantity, 0), 0),
+        occupiedAreaCm2: sheetSummaries.reduce((sum, entry) => sum + entry.pricing.occupiedAreaCm2, 0),
+        alphaPrintedAreaCm2: sheetSummaries.reduce((sum, entry) => sum + entry.pricing.alphaPrintedAreaCm2, 0),
+        recommendedPrice: sheetSummaries.reduce((sum, entry) => sum + entry.pricing.recommendedPrice, 0),
+        estimatedCosts: sheetSummaries.reduce((sum, entry) => sum + entry.consumption.totalCosts, 0),
+        placementIssues: sheetSummaries.reduce((sum, entry) => sum + entry.placement.issueCount, 0),
+      },
+    };
+  };
 
   const saveProject = () => {
     downloadProjectJson(makeProjectPayload());
   };
 
   const exportZip = async () => {
-    if (!stageRef.current) return;
+    const stage = stageRef.current;
+    if (!stage) return;
     setSelectedIds([]);
-    requestAnimationFrame(async () => {
-      try {
-        await exportProjectZip({
-          stage: stageRef.current,
-          sheet,
-          project: makeProjectPayload(),
-          summary: makeSummary(),
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    const previousActiveSheetId = activeSheetId;
+
+    try {
+      const pngEntries = [];
+
+      for (let index = 0; index < sheets.length; index += 1) {
+        const currentSheet = sheets[index];
+        setActiveSheetId(currentSheet.id);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const exportSheet = {
+          ...currentSheet,
+          widthPx: cmToPx(currentSheet.widthCm, currentSheet.dpi),
+          heightPx: cmToPx(currentSheet.heightCm, currentSheet.dpi),
+        };
+        const dataUrl = exportTransparentPng(stage, exportSheet, {
           includeGuides: guideSettings.exportGuides,
+          includeDpiMetadata: true,
         });
-        setStatus('ZIP-Export erstellt.');
-      } catch (error) {
-        setStatus(`ZIP-Export fehlgeschlagen: ${error.message}`);
+        pngEntries.push({
+          filename: `${String(index + 1).padStart(2, '0')}-${safeFileName(currentSheet.name || `sheet-${index + 1}`)}.png`,
+          dataUrl,
+        });
       }
-    });
+
+      await exportProjectZip({
+        pngEntries,
+        project: makeProjectPayload(),
+        summary: sheets.length > 1 ? makeProjectSummary() : makeSummary(),
+      });
+      setStatus(sheets.length > 1 ? `ZIP-Export mit ${sheets.length} Sheets erstellt.` : 'ZIP-Export erstellt.');
+    } catch (error) {
+      setStatus(`ZIP-Export fehlgeschlagen: ${error.message}`);
+    } finally {
+      setActiveSheetId(previousActiveSheetId);
+    }
   };
 
   const applyProject = async (project) => {
@@ -724,7 +820,7 @@ export default function App() {
       <header className="app-header">
         <div>
           <h1>DTF Gang Sheet Builder</h1>
-          <p>Lokaler PNG-Editor fuer transparente DTF-Sheets.</p>
+          <p>Lokaler PNG-Editor für transparente DTF-Sheets.</p>
         </div>
         <div className="header-actions">
           {status ? <span className="status">{status}</span> : null}
@@ -741,6 +837,7 @@ export default function App() {
             onRestoreAutosave={restoreAutosave}
             onClearAutosave={removeAutosave}
           />
+          <QuickStartPanel />
           <TemplateSelector value={sheetTemplate} onChange={applyTemplate} />
           <SheetSettings settings={activeSheet} sheetPixels={sheet} onChange={updateActiveSheet} />
           <ExportSafetyPanel stats={exportStats} />
@@ -855,6 +952,46 @@ function groupItems(items) {
     groups.get(key).items.push(item);
   });
   return Array.from(groups.values());
+}
+
+function packItemsAcrossSheets(items, sheet, gapMm, options) {
+  const pages = [];
+  let remaining = items.map((item) => ({ ...item }));
+  let guard = 0;
+
+  while (remaining.length && guard < 50) {
+    const result = autoPackItemsWithOptions(remaining, sheet, gapMm, options);
+    const overflowIds = new Set(result.overflowItems.map((item) => item.id));
+    const packedItems = result.items.filter((item) => !overflowIds.has(item.id));
+
+    if (!packedItems.length) {
+      pages.push({
+        items: result.items,
+        beforeUtilization: result.beforeUtilization,
+        afterUtilization: result.afterUtilization,
+        overflow: true,
+      });
+      break;
+    }
+
+    pages.push({
+      items: packedItems,
+      beforeUtilization: result.beforeUtilization,
+      afterUtilization: result.afterUtilization,
+      overflow: false,
+    });
+    remaining = result.overflowItems.map((item) => ({ ...item }));
+    guard += 1;
+  }
+
+  return pages.length ? pages : [{ items: [], beforeUtilization: 0, afterUtilization: 0, overflow: false }];
+}
+
+function safeFileName(value) {
+  return String(value || 'sheet')
+    .trim()
+    .replace(/[^a-zA-Z0-9äöüÄÖÜß_-]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'sheet';
 }
 
 function useEffectForKeys({ deleteSelected, undo, redo }) {

@@ -71,8 +71,8 @@ export default function ConsumptionPanel({ sheet, items, values, onChange }) {
         </div>
       </dl>
       <p className="meta small">
-        Folie wird nach Sheet-Laenge gerechnet. Pulver und Tinte nutzen die belegte Motivflaeche:{' '}
-        {result.printAreaM2.toFixed(3)} m2. Sheet-Flaeche: {result.areaM2.toFixed(3)} m2.
+        Folie wird nach Sheet-Länge gerechnet. Pulver und Tinte nutzen die belegte Motivfläche:{' '}
+        {result.printAreaM2.toFixed(3)} m2. Sheet-Fläche: {result.areaM2.toFixed(3)} m2.
       </p>
     </section>
   );

@@ -19,7 +19,7 @@ export function checkPlacement(items, sheet, gapMm) {
 
   boxes.forEach(({ item, box }) => {
     if (box.x < 0 || box.y < 0 || box.x + box.width > sheet.widthPx || box.y + box.height > sheet.heightPx) {
-      addIssue([item.id], 'outside', `${item.name} liegt ausserhalb vom Sheet.`, 'error');
+      addIssue([item.id], 'outside', `${item.name} liegt außerhalb vom Sheet.`, 'error');
     }
 
     if (box.x < gap || box.y < gap || sheet.widthPx - (box.x + box.width) < gap || sheet.heightPx - (box.y + box.height) < gap) {
@@ -32,7 +32,7 @@ export function checkPlacement(items, sheet, gapMm) {
       const first = boxes[index];
       const second = boxes[compareIndex];
       if (boxesOverlap(first.box, second.box)) {
-        addIssue([first.item.id, second.item.id], 'overlap', `${first.item.name} ueberlappt mit ${second.item.name}.`, 'error');
+        addIssue([first.item.id, second.item.id], 'overlap', `${first.item.name} überlappt mit ${second.item.name}.`, 'error');
         continue;
       }
       if (distanceBetweenBoxes(first.box, second.box) < gap) {

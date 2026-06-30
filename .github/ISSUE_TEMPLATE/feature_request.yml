@@ -1,0 +1,24 @@
+name: Feature request
+about: Schlage eine neue Funktion vor
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem oder Workflow
+      description: Welches DTF-Problem soll das Feature lösen?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Gewünschte Lösung
+      description: Wie stellst du dir die Funktion vor?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativen
+      description: Gibt es Workarounds oder andere Tools, die das schon können?

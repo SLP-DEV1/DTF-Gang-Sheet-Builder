@@ -49,7 +49,7 @@ export default function SheetTabs({ sheets, activeId, onSelect, onAdd, onDelete,
                 {sheets.length > 1 && (
                   <button
                     className="sheet-tab-delete"
-                    title="Sheet loeschen"
+                    title="Sheet löschen"
                     onClick={(e) => { e.stopPropagation(); onDelete(sheet.id); }}
                   >
                     ×
@@ -63,7 +63,7 @@ export default function SheetTabs({ sheets, activeId, onSelect, onAdd, onDelete,
       <div className="sheet-tab-actions">
         <select
           id="add-sheet-template"
-          title="Sheet-Vorlage zum Hinzufuegen"
+          title="Sheet-Vorlage zum Hinzufügen"
           defaultValue={TEMPLATES[0].id}
         >
           {TEMPLATES.filter((t) => t.id !== 'custom').map((t) => (
@@ -71,7 +71,7 @@ export default function SheetTabs({ sheets, activeId, onSelect, onAdd, onDelete,
           ))}
         </select>
         <button
-          title="Neues Sheet hinzufuegen"
+          title="Neues Sheet hinzufügen"
           onClick={() => {
             const sel = document.getElementById('add-sheet-template');
             onAdd(sel?.value || TEMPLATES[0].id);

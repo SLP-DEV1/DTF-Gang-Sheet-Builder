@@ -10,6 +10,14 @@
   --secondary: #eef3f7;
   --secondary-text: #203344;
   --danger: #be3a34;
+  --bg-secondary: var(--panel-soft);
+  --bg-tertiary: var(--secondary);
+  --bg-elevated: var(--panel);
+  --border-color: var(--border);
+  --text-primary: var(--text);
+  --text-secondary: var(--muted);
+  --color-primary: var(--primary);
+  --color-danger: var(--danger);
   --shadow: 0 14px 34px rgba(31, 43, 55, 0.08);
   color: var(--text);
   background: var(--page);
@@ -212,6 +220,71 @@ select {
   margin-top: 10px;
 }
 
+
+.compact-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.9rem;
+}
+
+.details-box {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 10px 12px;
+}
+
+.details-box summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--secondary-text);
+}
+
+.shortcut-list {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.shortcut-list div {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.shortcut-list dt {
+  width: fit-content;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  padding: 3px 7px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.shortcut-list dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.small-button {
+  min-height: 34px;
+  padding: 7px 8px;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
 .button-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -409,7 +482,72 @@ select {
 }
 
 .motif-card > .field,
-.motif-card > .button-row {
+.motif-card > 
+.compact-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.9rem;
+}
+
+.details-box {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 10px 12px;
+}
+
+.details-box summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--secondary-text);
+}
+
+.shortcut-list {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.shortcut-list div {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.shortcut-list dt {
+  width: fit-content;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  padding: 3px 7px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.shortcut-list dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.small-button {
+  min-height: 34px;
+  padding: 7px 8px;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.button-row {
   grid-column: 1 / -1;
 }
 

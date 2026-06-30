@@ -1,48 +1,85 @@
 # DTF Gang Sheet Builder
 
-Browserbasierte React + Vite App zum Erstellen von DTF-Gang-Sheets aus transparenten PNG-Dateien.
-Alles laeuft lokal im Browser, ohne Backend, externe Uploads, Datenbank oder API Keys.
+[![Deploy to GitHub Pages](https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder/actions/workflows/deploy.yml/badge.svg)](https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder/actions/workflows/deploy.yml)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Built with React](https://img.shields.io/badge/React-18-blue.svg)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF.svg)
 
-## Funktionen
+Kostenloser, browserbasierter **DTF Gang Sheet Builder** zum Anordnen transparenter PNG-Motive und Exportieren druckfertiger Gang-Sheets.
 
-- PNG Upload mit mehreren Dateien gleichzeitig, Drag & Drop und Clipboard-Paste fuer PNG-Bilder
-- Warnung bei nicht unterstuetzten Dateitypen und PNGs ohne Transparenz
-- Transparente Motive frei platzieren, skalieren, drehen, duplizieren und loeschen
-- Undo/Redo fuer Editor-Aktionen per Button, `Strg+Z` und `Strg+Y`
-- Mehrfachauswahl per Strg/Shift-Klick mit gemeinsamem Verschieben
-- Multi-Select-Werkzeuge fuer links/rechts/oben/unten ausrichten, horizontal/vertikal verteilen sowie gleiche Breite/Hoehe
-- Motivgroesse direkt in cm bearbeiten, standardmaessig mit gesperrtem Seitenverhaeltnis
-- DPI-/Qualitaetswarnung pro Motiv: niedrig, okay oder gut
-- Motivliste mit Vorschaubild, Dateiname, cm-Groesse, Anzahl, Rotation und Schnellaktionen
-- Stueckzahlen pro Motivgruppe editieren, inklusive automatischem Duplizieren oder Reduzieren
-- Sheet-Vorlagen fuer 56 cm Rolle, 60 cm Rolle, A4, A3 und Custom
-- Sheet-Groesse in cm mit DPI-basierter Pixelberechnung
-- Besseres Auto-Nesting mit optionaler Groessensortierung und 90-Grad-Rotation
-- Auslastung vor/nach Auto Arrange und Warnung, wenn Motive nicht auf das Sheet passen
-- Kollisions-, Rand-, Ueberlappungs- und Mindestabstands-Pruefung
-- Optionale rote/orange Markierung betroffener Motive im Canvas
-- Optionale Abstandslinien und Schneidelinien im Canvas und optional im Export
-- Preisrechner in Euro fuer Flaeche, Arbeitszeit, Stundensatz, Marge, Mindestpreis und empfohlenen Verkaufspreis
-- Preis pro Motivgruppe und Preis pro Stueck
-- Grobe Verbrauchsberechnung in Euro: Folie nach Sheet-Laenge, Pulver und Tinte nach belegter Motivflaeche
+Die App läuft vollständig lokal im Browser. Es gibt keinen Server-Upload, keine Datenbank, keinen Login und keine API-Keys.
+
+## Live Demo
+
+```text
+https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/
+```
+
+## Highlights
+
+- PNG Upload mit mehreren Dateien, Drag & Drop und Clipboard-Paste
+- Transparente Motive verschieben, skalieren, drehen, duplizieren und löschen
+- Motivgröße direkt in Zentimetern bearbeiten
+- Größen-Presets für Brust, Rücken, Ärmel, Kinder-Shirt und A4-Breite
+- Auto Arrange mit Größensortierung und optionaler 90° Rotation
+- Automatische Verteilung auf mehrere Sheets, wenn nicht alles auf ein Sheet passt
+- Multi-Sheet Tabs mit Umbenennen, Löschen und neuen Sheet-Vorlagen
+- Vorlagen für 56 cm Rolle, 60 cm Rolle, A4, A3 und Custom
+- DPI-/Qualitätswarnung pro Motiv
+- Transparenz-Trimming pro Motivgruppe
+- Kollisions-, Rand-, Überlappungs- und Mindestabstandsprüfung
+- Schneidelinien und Abstandslinien optional im Canvas und Export
+- Preisrechner mit Arbeitszeit, Stundensatz, Marge und Mindestpreis
+- Verbrauchsrechner für Folie, Pulver und Tinte
+- Export-Sicherheitsanzeige mit Pixelgröße, Megapixeln und geschätztem RAM-Verbrauch
+- PNG-Export mit 300-DPI-Metadaten
+- ZIP-Export mit PNG-Dateien, `project.json`, `summary.json` und `summary.txt`
+- Projektdatei als JSON speichern und später wieder laden
+- IndexedDB-Autosave mit Wiederherstellen- und Löschen-Button
+- Dark Mode
 - White-Underbase-Vorschau als reine Anzeigehilfe
-- Export-Sicherheitsanzeige mit Pixelgroesse, Megapixeln und geschaetztem RAM-Verbrauch
-- Warnung bei sehr grossen Exporten ueber 150 Megapixel
-- Export als transparentes PNG mit pHYs-DPI-Metadaten
-- ZIP-Export mit `gang-sheet.png`, `project.json`, `summary.json` und `summary.txt`
-- Projekt als JSON speichern und wieder laden, inklusive Profi-Einstellungen
-- Autosave im Browser mit Wiederherstellen- und Loeschen-Button
-- Dark Mode mit Speicherung in `localStorage`
 
+## Wofür ist das Tool gedacht?
+
+Der Builder ist für kleine DTF-Druckshops, Creator und Hobbydrucker gedacht, die PNG-Motive schnell und platzsparend auf einer Druckfläche vorbereiten möchten.
+
+Typische Workflows:
+
+1. Motive als transparente PNGs hochladen.
+2. Sheet-Breite und Sheet-Höhe festlegen.
+3. Stückzahlen pro Motivgruppe einstellen.
+4. Motive automatisch anordnen lassen.
+5. Platzierungswarnungen, Preis und Verbrauch prüfen.
+6. Als PNG oder ZIP exportieren.
+
+## Datenschutz
+
+Alle Dateien bleiben lokal im Browser des Nutzers.
+
+Die App:
+
+- lädt keine Motive auf einen Server hoch
+- verwendet keine Datenbank
+- nutzt keine API-Keys
+- speichert keine persönlichen Daten extern
+- funktioniert ohne Login
+
+Autosave wird lokal im Browser über IndexedDB gespeichert und kann jederzeit gelöscht werden.
 
 ## Installation
 
 ```bash
+git clone https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder.git
+cd DTF-Gang-Sheet-Builder
 npm install
 npm run dev
 ```
 
-Danach die lokale Vite-Adresse im Browser oeffnen.
+Danach die angezeigte Vite-Adresse öffnen, zum Beispiel:
+
+```text
+http://localhost:5173/
+```
 
 ## Production Build
 
@@ -51,51 +88,82 @@ npm run build
 npm run preview
 ```
 
-Beim Build kann wegen der ZIP-Bibliotheken ein Vite-Hinweis zu groesseren Chunks erscheinen. Der Build ist trotzdem gueltig.
+Der Build erzeugt den Ordner `dist/`. Dieser Ordner wird nicht ins Repository committed, sondern bei GitHub Pages automatisch neu gebaut.
 
-## Nutzung
+## GitHub Pages Deployment
 
-1. Vorlage, Sheet-Breite, Hoehe und DPI einstellen.
-2. Transparente PNG-Dateien hochladen, ablegen oder aus der Zwischenablage einfuegen.
-3. Motive auf dem Canvas auswaehlen und bearbeiten.
-4. Mehrere Motive per Strg/Shift-Klick auswaehlen und gemeinsam ausrichten oder verteilen.
-5. Motivgroessen in cm oder per Canvas-Transformation anpassen.
-6. Stueckzahlen in der Motivliste festlegen.
-7. Optional Auto-Nesting, Rotation, Abstandslinien, Schneidelinien oder White-Underbase-Vorschau aktivieren.
-8. Platzierungswarnungen, Preis, Verbrauch und Export-Sicherheit pruefen.
-9. Als PNG, ZIP oder Projekt-JSON exportieren.
+Das Projekt enthält bereits einen Workflow unter:
+
+```text
+.github/workflows/deploy.yml
+```
+
+Einrichtung:
+
+1. Repository auf GitHub öffnen.
+2. **Settings → Pages** öffnen.
+3. Bei **Build and deployment** als Source **GitHub Actions** auswählen.
+4. Eine Änderung auf `main` pushen oder den Workflow manuell starten.
+
+Die Vite-Konfiguration nutzt `base: './'`, damit Assets auch unter einer GitHub-Pages-Projekt-URL korrekt geladen werden.
 
 ## Projektdatei
 
-Die gespeicherte JSON-Datei enthaelt neben Sheet und Motiven auch:
+Die gespeicherte JSON-Datei enthält unter anderem:
 
-- Sheet-Vorlage
-- Preisrechner-Werte inklusive Arbeitszeit, Marge und Mindestpreis
-- Verbrauchswerte
+- Sheets und aktive Sheet-Auswahl
+- Motive, Positionen, Größen, Rotation und Bilddaten
+- Motivgruppen und Stückzahlen
+- Preis- und Verbrauchswerte
+- Hilfslinien- und Export-Einstellungen
+- Auto-Arrange-Einstellungen
 - Dark-Mode-Einstellung
-- Motivgruppen und Stueckzahlen
-- Motivgroessen, Rotation und Positionen
-- Hilfslinien-Einstellungen
-- White-Underbase-Vorschau
-- Auto-Nesting-Rotation, Groessensortierung und Abstand
 
 ## Export
 
-Vor dem Export zeigt die App die berechnete Pixelgroesse, Megapixel und den ungefaehren RAM-Bedarf an. Auswahlrahmen, Transformer und UI-Hilfsmarkierungen werden beim PNG- und ZIP-Export ausgeblendet. Abstandslinien und Schneidelinien landen nur im Export, wenn der entsprechende Export-Schalter aktiv ist.
+Der ZIP-Export enthält:
 
-## GitHub Pages
+```text
+gang-sheet.png oder mehrere Sheet-PNGs
+project.json
+summary.json
+summary.txt
+```
 
-Das Projekt enthaelt bereits einen GitHub-Actions-Workflow fuer GitHub Pages.
+Bei mehreren Sheets exportiert die App jedes Sheet als eigene PNG-Datei und legt alle Dateien gemeinsam ins ZIP.
 
-Nach dem Push zu GitHub:
+## White-Underbase-Hinweis
 
-1. Repository auf GitHub oeffnen
-2. **Settings -> Pages** oeffnen
-3. Bei **Build and deployment** als Source **GitHub Actions** waehlen
-4. Danach erneut auf `main` pushen oder den Workflow manuell starten
+Die White-Underbase-Funktion ist nur eine Vorschau. Die echte Weißunterlegung und Separation macht normalerweise das RIP oder die DTF-Drucksoftware.
 
-Die Vite-Konfiguration nutzt `base: './'`, damit die gebauten Assets auch auf einer GitHub-Pages-Projekt-URL korrekt geladen werden.
+## Tech Stack
+
+- React
+- Vite
+- Konva / react-konva
+- JSZip
+- FileSaver
+- IndexedDB
+- GitHub Actions
+- GitHub Pages
+
+## Roadmap
+
+Mögliche nächste Schritte:
+
+- Lineal und Raster in cm/mm
+- Snap-to-grid und Snap an andere Motive
+- Zoom und Pan im Canvas
+- Echte Alpha-Silhouette für White-Underbase statt Bounding-Box-Vorschau
+- Bessere Nesting-Algorithmen
+- Mehr Exportprofile für unterschiedliche RIPs
+- Screenshot/GIF-Demo in der README
+- Kleine Test-Suite für cm/mm/DPI-/Preisberechnungen
+
+## Mitmachen
+
+Issues und Pull Requests sind willkommen. Bitte lies vorher [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Lizenz
 
-MIT
+MIT License. Details stehen in [LICENSE](LICENSE).

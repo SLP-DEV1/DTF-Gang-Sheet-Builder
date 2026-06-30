@@ -2,7 +2,7 @@ export default function MultiSelectPanel({ selectedCount, onCommand, canUndo, ca
   return (
     <section className="panel">
       <h2>Mehrfachauswahl</h2>
-      <p className="meta">{selectedCount} Motiv(e) ausgewaehlt.</p>
+      <p className="meta">{selectedCount} Motiv(e) ausgewählt.</p>
       <div className="button-row compact-buttons">
         <button className="button secondary" type="button" onClick={() => onCommand('align-left')} disabled={selectedCount < 2}>
           Links
@@ -26,7 +26,7 @@ export default function MultiSelectPanel({ selectedCount, onCommand, canUndo, ca
           Gleiche Breite
         </button>
         <button className="button secondary" type="button" onClick={() => onCommand('same-height')} disabled={selectedCount < 2}>
-          Gleiche Hoehe
+          Gleiche Höhe
         </button>
       </div>
       <div className="button-row history-buttons">

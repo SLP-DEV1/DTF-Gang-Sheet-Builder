@@ -1,8 +1,29 @@
 {
   "name": "dtf-gang-sheet-builder",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
+  "description": "Free browser-based DTF gang sheet builder for arranging transparent PNG designs and exporting print-ready gang sheets.",
+  "homepage": "https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "dtf",
+    "gang-sheet",
+    "print",
+    "png",
+    "canvas",
+    "react",
+    "vite",
+    "konva",
+    "transfer-printing"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -17,9 +38,7 @@
     "react-konva": "^18.2.10"
   },
   "devDependencies": {
-    "vite": "^6.0.5",
-    "@vitejs/plugin-react": "^4.3.4"
-  },
-  "description": "Browser-based DTF gang sheet builder for arranging transparent PNG designs and exporting print-ready sheets.",
-  "license": "MIT"
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.5"
+  }
 }
