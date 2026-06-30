@@ -21,6 +21,26 @@ npm run dev
 
 Danach die lokale Vite-Adresse im Browser öffnen.
 
+## Production Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## GitHub Pages
+
+Das Projekt enthält bereits einen GitHub-Actions-Workflow für GitHub Pages.
+
+Nach dem Push zu GitHub:
+
+1. Repository auf GitHub öffnen
+2. **Settings → Pages** öffnen
+3. Bei **Build and deployment** als Source **GitHub Actions** wählen
+4. Danach erneut auf `main` pushen oder den Workflow manuell starten
+
+Die Vite-Konfiguration nutzt `base: './'`, damit die gebauten Assets auch auf einer GitHub-Pages-Projekt-URL korrekt geladen werden.
+
 ## Nutzung
 
 1. Sheet-Breite, Höhe und DPI einstellen.
@@ -37,6 +57,8 @@ Danach die lokale Vite-Adresse im Browser öffnen.
 - Objektliste mit Ebenensteuerung
 - Exakter Größeneditor in cm/mm pro Motiv
 - Export-Vorschau vor dem Download
+- Warnung bei zu großen Sheets im Browser
+- Besseres Nesting mit optionaler Rotation
 
 ## Lizenz
 
