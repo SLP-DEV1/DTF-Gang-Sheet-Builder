@@ -75,9 +75,21 @@ export default function PricingPanel({ items, groups, sheet, values, onChange })
       </label>
       <dl className="result-list">
         <div>
-          <dt>Belegte Flaeche</dt>
+          <dt>Umriss-Flaeche (Bounding Box)</dt>
           <dd>{result.occupiedAreaCm2.toFixed(2)} cm2</dd>
         </div>
+        {result.alphaPrintedAreaCm2 !== undefined && result.alphaPrintedAreaCm2 !== result.occupiedAreaCm2 ? (
+          <div>
+            <dt>Tatsaechliche Druckflaeche (Alpha)</dt>
+            <dd>
+              {result.alphaPrintedAreaCm2.toFixed(2)} cm2
+              {' '}
+              <span className="meta small">
+                ({((result.alphaPrintedAreaCm2 / result.occupiedAreaCm2) * 100).toFixed(0)}% der Umrissflaeche)
+              </span>
+            </dd>
+          </div>
+        ) : null}
         <div>
           <dt>Sheet-Flaeche</dt>
           <dd>{result.sheetAreaCm2.toFixed(2)} cm2</dd>
@@ -87,9 +99,15 @@ export default function PricingPanel({ items, groups, sheet, values, onChange })
           <dd>{result.utilizationPercent.toFixed(1)}%</dd>
         </div>
         <div>
-          <dt>Motivpreis</dt>
+          <dt>Motivpreis (Umriss)</dt>
           <dd>{euro.format(result.occupiedPrice)}</dd>
         </div>
+        {result.alphaMaterialPrice !== undefined && result.alphaMaterialPrice !== result.occupiedPrice ? (
+          <div>
+            <dt>Motivpreis (Alpha-basiert)</dt>
+            <dd>{euro.format(result.alphaMaterialPrice)}</dd>
+          </div>
+        ) : null}
         <div>
           <dt>Komplettes Sheet</dt>
           <dd>{euro.format(result.fullSheetPrice)}</dd>

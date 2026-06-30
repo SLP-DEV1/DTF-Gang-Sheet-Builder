@@ -10,6 +10,7 @@ export default function MotifList({
   onDelete,
   onDeleteGroup,
   onQuantityChange,
+  onTrimGroup,
 }) {
   return (
     <section className="panel">
@@ -53,6 +54,11 @@ export default function MotifList({
                   <button className="button secondary" type="button" onClick={() => onDuplicate(item.id)}>
                     Duplizieren
                   </button>
+                  {onTrimGroup && (
+                    <button className="button secondary" type="button" onClick={() => onTrimGroup(group.key)}>
+                      Transparenz trimmen
+                    </button>
+                  )}
                   <button className="button danger" type="button" onClick={() => onDelete(item.id)}>
                     Loeschen
                   </button>

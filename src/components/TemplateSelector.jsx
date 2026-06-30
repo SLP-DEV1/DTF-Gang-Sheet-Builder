@@ -1,4 +1,4 @@
-const TEMPLATES = [
+export const TEMPLATES = [
   { id: 'roll-56', label: '56 cm Rolle', widthCm: 56 },
   { id: 'roll-60', label: '60 cm Rolle', widthCm: 60 },
   { id: 'a4', label: 'A4', widthCm: 21, heightCm: 29.7 },

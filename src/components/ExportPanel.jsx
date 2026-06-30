@@ -8,6 +8,8 @@ export default function ExportPanel({
   onUpdateSelected,
   onUpdateSelectedSizeCm,
   onExportPng,
+  onExportAllPng,
+  sheetsCount,
   onExportZip,
   onSaveProject,
   guideSettings,
@@ -97,8 +99,13 @@ export default function ExportPanel({
           <span>Hilfslinien exportieren</span>
         </label>
         <button className="button primary" type="button" onClick={onExportPng}>
-          Download PNG
+          Download PNG (aktuelles Sheet)
         </button>
+        {sheetsCount > 1 && (
+          <button className="button secondary full" type="button" onClick={onExportAllPng}>
+            Alle {sheetsCount} Sheets als PNG exportieren
+          </button>
+        )}
         <button className="button secondary full" type="button" onClick={onExportZip}>
           Export ZIP
         </button>

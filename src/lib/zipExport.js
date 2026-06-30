@@ -1,5 +1,3 @@
-import { saveAs } from 'file-saver';
-import JSZip from 'jszip';
 import { exportTransparentPng } from './exportImage.js';
 
 function dataUrlToBase64(dataUrl) {
@@ -7,6 +5,7 @@ function dataUrlToBase64(dataUrl) {
 }
 
 export async function exportProjectZip({ stage, sheet, project, summary, includeGuides }) {
+  const JSZip = (await import('jszip')).default;
   const zip = new JSZip();
   const pngDataUrl = exportTransparentPng(stage, sheet, { includeGuides });
 
@@ -27,6 +26,7 @@ export async function exportProjectZip({ stage, sheet, project, summary, include
     ].join('\n'),
   );
 
+  const { saveAs } = await import('file-saver');
   const blob = await zip.generateAsync({ type: 'blob' });
   saveAs(blob, 'dtf-gang-sheet-export.zip');
 }

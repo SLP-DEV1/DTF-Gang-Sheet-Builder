@@ -482,3 +482,126 @@ select {
     padding: 14px;
   }
 }
+
+/* Sheet Tabs */
+.sheet-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.sheet-tab-list {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.sheet-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sheet-tab:hover {
+  background: var(--bg-elevated);
+}
+
+.sheet-tab.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  font-weight: 600;
+}
+
+.sheet-tab-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheet-tab-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin-left: 2px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sheet-tab-delete:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+.sheet-tab-input {
+  width: 80px;
+  padding: 2px 4px;
+  border: 1px solid var(--color-primary);
+  border-radius: 3px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.sheet-tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.sheet-tab-actions select {
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+
+.sheet-tab-actions button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sheet-tab-actions button:hover {
+  opacity: 0.9;
+}
+
+.sheet-tab-count {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding-left: 4px;
+}

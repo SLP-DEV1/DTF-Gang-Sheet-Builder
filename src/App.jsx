@@ -9,7 +9,8 @@ import MultiSelectPanel from './components/MultiSelectPanel.jsx';
 import PlacementWarnings from './components/PlacementWarnings.jsx';
 import PricingPanel from './components/PricingPanel.jsx';
 import SheetSettings from './components/SheetSettings.jsx';
-import TemplateSelector from './components/TemplateSelector.jsx';
+import TemplateSelector, { TEMPLATES } from './components/TemplateSelector.jsx';
+import SheetTabs from './components/SheetTabs.jsx';
 import Toolbar from './components/Toolbar.jsx';
 import UploadPanel from './components/UploadPanel.jsx';
 import { clearAutosave, loadAutosave, saveAutosave } from './lib/autosave.js';
@@ -17,7 +18,7 @@ import { calculateConsumption } from './lib/consumption.js';
 import { getExportStats } from './lib/exportSafety.js';
 import { exportTransparentPng, downloadDataUrl } from './lib/exportImage.js';
 import { getBounds, getVisualBox, moveItemBoxTo } from './lib/geometry.js';
-import { imageHasTransparency } from './lib/imageAnalysis.js';
+import { calculateAlphaRatio, imageHasTransparency, trimTransparency } from './lib/imageAnalysis.js';
 import { autoPackItemsWithOptions } from './lib/packing.js';
 import { checkPlacement } from './lib/placement.js';
 import { calculatePricing, getItemPrintedSizeCm } from './lib/pricing.js';
@@ -30,11 +31,21 @@ import { calculateEffectiveDpi } from './lib/quality.js';
 import { cmToPx, DEFAULT_DPI } from './lib/units.js';
 import { exportProjectZip } from './lib/zipExport.js';
 
-const initialSettings = {
+const defaultSheetConfig = {
   widthCm: 56,
   heightCm: 100,
   dpi: DEFAULT_DPI,
 };
+
+let sheetCounter = 0;
+function createDefaultSheet(name) {
+  sheetCounter++;
+  return {
+    id: makeId(),
+    name: name || `Sheet ${sheetCounter}`,
+    ...defaultSheetConfig,
+  };
+}
 
 const initialPricing = {
   pricePerCm2: 0.018,
@@ -83,7 +94,8 @@ function readFileAsDataUrl(file) {
 }
 
 export default function App() {
-  const [settings, setSettings] = useState(initialSettings);
+  const [sheets, setSheets] = useState(() => [createDefaultSheet('Sheet 1')]);
+  const [activeSheetId, setActiveSheetId] = useState(() => sheets[0].id);
   const [items, setItems] = useState([]);
   const [images, setImages] = useState(new Map());
   const [selectedIds, setSelectedIds] = useState([]);
@@ -103,24 +115,35 @@ export default function App() {
   const historyRef = useRef([]);
   const redoRef = useRef([]);
   const stageRef = useRef(null);
+  const activeSheetIdRef = useRef(activeSheetId);
+  useEffect(() => { activeSheetIdRef.current = activeSheetId; }, [activeSheetId]);
+
+  // Active Sheet abgeleitet aus sheets[] Array
+  const activeSheet = sheets.find((s) => s.id === activeSheetId) || sheets[0];
 
   const sheet = useMemo(
     () => ({
-      ...settings,
-      widthPx: cmToPx(settings.widthCm, settings.dpi),
-      heightPx: cmToPx(settings.heightCm, settings.dpi),
+      ...activeSheet,
+      widthPx: cmToPx(activeSheet.widthCm, activeSheet.dpi),
+      heightPx: cmToPx(activeSheet.heightCm, activeSheet.dpi),
     }),
-    [settings],
+    [activeSheet],
+  );
+
+  // Items nach aktivem Sheet filtern
+  const sheetItems = useMemo(
+    () => items.filter((item) => item.sheetId === activeSheetId),
+    [items, activeSheetId],
   );
 
   const selectedId = selectedIds[0] || null;
   const selectedItem = items.find((item) => item.id === selectedId) || null;
   const selectedSizeCm = selectedItem
-    ? getItemPrintedSizeCm(selectedItem, settings.dpi)
+    ? getItemPrintedSizeCm(selectedItem, activeSheet.dpi)
     : { widthCm: 0, heightCm: 0 };
-  const motifGroups = useMemo(() => groupItems(items), [items]);
+  const motifGroups = useMemo(() => groupItems(sheetItems), [sheetItems]);
   const exportStats = useMemo(() => getExportStats(sheet), [sheet]);
-  const placementResult = useMemo(() => checkPlacement(items, sheet, gapMm), [items, sheet, gapMm]);
+  const placementResult = useMemo(() => checkPlacement(sheetItems, sheet, gapMm), [sheetItems, sheet, gapMm]);
 
   const pushHistory = (snapshot) => {
     historyRef.current = [...historyRef.current.slice(-49), snapshot.map((item) => ({ ...item }))];
@@ -136,9 +159,11 @@ export default function App() {
     });
   };
 
-  const updateSettings = (patch) => {
+  const updateActiveSheet = (patch) => {
     setSheetTemplate('custom');
-    setSettings((current) => ({ ...current, ...patch }));
+    setSheets((current) =>
+      current.map((s) => (s.id === activeSheetId ? { ...s, ...patch } : s)),
+    );
   };
 
   const updateGuideSettings = (patch) => {
@@ -148,11 +173,54 @@ export default function App() {
   const applyTemplate = (template) => {
     setSheetTemplate(template.id);
     if (template.id === 'custom') return;
-    setSettings((current) => ({
-      ...current,
-      widthCm: template.widthCm,
-      heightCm: template.heightCm || current.heightCm,
-    }));
+    setSheets((current) =>
+      current.map((s) =>
+        s.id === activeSheetId
+          ? { ...s, widthCm: template.widthCm, heightCm: template.heightCm ?? s.heightCm }
+          : s,
+      ),
+    );
+  };
+
+  // Sheet-Management
+  const addSheet = (template) => {
+    const tpl = template || sheetTemplate;
+    const matched = TEMPLATES.find((t) => t.id === tpl);
+    const newSheet = {
+      id: makeId(),
+      name: `Sheet ${sheets.length + 1}`,
+      widthCm: matched && matched.id !== 'custom' ? matched.widthCm : defaultSheetConfig.widthCm,
+      heightCm: (matched && matched.id !== 'custom' ? matched.heightCm : null) ?? defaultSheetConfig.heightCm,
+      dpi: defaultSheetConfig.dpi,
+    };
+    setSheets((current) => [...current, newSheet]);
+    setActiveSheetId(newSheet.id);
+  };
+
+  const deleteSheet = (sheetId) => {
+    setSheets((current) => {
+      if (current.length <= 1) return current;
+      const filtered = current.filter((s) => s.id !== sheetId);
+      // Items des gelöschten Sheets entfernen
+      setItems((prev) => prev.filter((item) => item.sheetId !== sheetId));
+      setImages((prev) => {
+        const removeIds = new Set(items.filter((i) => i.sheetId === sheetId).map((i) => i.id));
+        const next = new Map(prev);
+        removeIds.forEach((id) => next.delete(id));
+        return next;
+      });
+      if (activeSheetId === sheetId && filtered.length > 0) {
+        setActiveSheetId(filtered[0].id);
+      }
+      setSelectedIds([]);
+      return filtered;
+    });
+  };
+
+  const renameSheet = (sheetId, name) => {
+    setSheets((current) =>
+      current.map((s) => (s.id === sheetId ? { ...s, name } : s)),
+    );
   };
 
   const addImageItems = useCallback(async (files) => {
@@ -174,6 +242,7 @@ export default function App() {
         const groupKey = makeId();
         const width = image.naturalWidth || image.width;
         const height = image.naturalHeight || image.height;
+        const alphaRatio = calculateAlphaRatio(image);
         return {
           image,
           item: {
@@ -190,6 +259,8 @@ export default function App() {
             scaleX: 1,
             scaleY: 1,
             rotation: 0,
+            alphaAreaRatio: alphaRatio,
+            sheetId: activeSheetIdRef.current,
           },
         };
       }),
@@ -243,8 +314,8 @@ export default function App() {
   const updateSelectedSizeCm = (patch) => {
     if (!selectedItem) return;
     const nextPatch = {};
-    if (patch.widthCm) nextPatch.scaleX = Math.max(0.01, cmToPx(patch.widthCm, settings.dpi) / selectedItem.width);
-    if (patch.heightCm) nextPatch.scaleY = Math.max(0.01, cmToPx(patch.heightCm, settings.dpi) / selectedItem.height);
+    if (patch.widthCm) nextPatch.scaleX = Math.max(0.01, cmToPx(patch.widthCm, activeSheet.dpi) / selectedItem.width);
+    if (patch.heightCm) nextPatch.scaleY = Math.max(0.01, cmToPx(patch.heightCm, activeSheet.dpi) / selectedItem.height);
 
     if (!aspectUnlocked) {
       if (patch.widthCm) nextPatch.scaleY = nextPatch.scaleX;
@@ -317,6 +388,51 @@ export default function App() {
     applyItemsChange((current) => [...current, ...clones]);
   };
 
+  const trimGroup = async (groupKey) => {
+    const group = items.filter((item) => item.groupKey === groupKey);
+    if (!group.length) return;
+    const source = images.get(group[0].id);
+    if (!source) {
+      setStatus('Bild konnte nicht geladen werden.');
+      return;
+    }
+    try {
+      const trimmed = trimTransparency(source);
+      const newSrc = trimmed.dataUrl;
+      const newImage = await loadImage(newSrc);
+
+      // Berechne neuen Scale um dieselbe Größe in cm zu behalten
+      const oldWidthPx = group[0].width * group[0].scaleX;
+      const scaleFactor = oldWidthPx / trimmed.width || 1;
+      const newAlphaRatio = calculateAlphaRatio(newImage);
+
+      setImages((current) => {
+        const next = new Map(current);
+        group.forEach((item) => next.set(item.id, newImage));
+        return next;
+      });
+      applyItemsChange((current) =>
+        current.map((item) => {
+          if (item.groupKey !== groupKey) return item;
+          return {
+            ...item,
+            src: newSrc,
+            width: trimmed.width,
+            height: trimmed.height,
+            scaleX: scaleFactor,
+            scaleY: scaleFactor,
+            alphaAreaRatio: newAlphaRatio,
+          };
+        }),
+      );
+      setStatus(
+        `Transparenz getrimmt: ${trimmed.originalWidth}x${trimmed.originalHeight}px -> ${trimmed.width}x${trimmed.height}px`,
+      );
+    } catch (error) {
+      setStatus(`Trim fehlgeschlagen: ${error.message}`);
+    }
+  };
+
   const arrangeItems = () => {
     const result = autoPackItemsWithOptions(items, sheet, gapMm, {
       allowRotation: allowPackingRotation,
@@ -355,8 +471,44 @@ export default function App() {
     });
   };
 
+  const exportAllPng = async () => {
+    const stage = stageRef.current;
+    if (!stage || sheets.length < 2) return;
+    setSelectedIds([]);
+
+    const previousActiveSheetId = activeSheetId;
+
+    for (let i = 0; i < sheets.length; i++) {
+      const s = sheets[i];
+      // Switch to this sheet and wait for canvas re-render
+      setActiveSheetId(s.id);
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      runExport(() => {
+        const sSheet = {
+          ...s,
+          widthPx: cmToPx(s.widthCm, s.dpi),
+          heightPx: cmToPx(s.heightCm, s.dpi),
+        };
+        const dataUrl = exportTransparentPng(stage, sSheet, {
+          includeGuides: guideSettings.exportGuides,
+          includeDpiMetadata: true,
+        });
+        const safeName = (s.name || `sheet-${i + 1}`).replace(/[^a-zA-Z0-9äöüÄÖÜß_-]/g, '-');
+        downloadDataUrl(dataUrl, `${safeName}.png`);
+      });
+
+      // Small delay between downloads so the browser doesn't block them
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+
+    // Restore original active sheet
+    setActiveSheetId(previousActiveSheetId);
+    setStatus(`${sheets.length} Sheets als PNG exportiert.`);
+  };
+
   const makeProjectPayload = () =>
-    createProjectPayload(settings, items, {
+    createProjectPayload(sheets, activeSheetId, items, {
       sheetTemplate,
       pricingValues,
       consumptionValues,
@@ -368,7 +520,7 @@ export default function App() {
     });
 
   const makeSummary = () => ({
-    sheet: settings,
+    sheet: activeSheet,
     export: exportStats,
     placement: { issueCount: placementResult.issues.length, summary: placementResult.summary },
     motifs: motifGroups.map((group) => {
@@ -376,13 +528,13 @@ export default function App() {
       return {
         name: item.name,
         quantity: group.items.length,
-        sizeCm: getItemPrintedSizeCm(item, settings.dpi),
+        sizeCm: getItemPrintedSizeCm(item, activeSheet.dpi),
         rotation: item.rotation,
-        quality: calculateEffectiveDpi(item, settings.dpi),
+        quality: calculateEffectiveDpi(item, activeSheet.dpi),
       };
     }),
-    pricing: calculatePricing({ items, sheet: settings, ...pricingValues }),
-    consumption: calculateConsumption({ sheet: settings, values: consumptionValues, items }),
+    pricing: calculatePricing({ items: sheetItems, sheet: activeSheet, ...pricingValues }),
+    consumption: calculateConsumption({ sheet: activeSheet, values: consumptionValues, items: sheetItems }),
   });
 
   const saveProject = () => {
@@ -409,16 +561,31 @@ export default function App() {
   };
 
   const applyProject = async (project) => {
+    // Multi-sheet: neue Projekte haben sheets[], alte Projekte nutzen sheetSettings (Legacy-Fallback)
+    let loadedSheets;
+    let loadedActiveSheetId;
+    if (Array.isArray(project.sheets)) {
+      loadedSheets = project.sheets;
+      loadedActiveSheetId = project.activeSheetId || loadedSheets[0]?.id;
+    } else {
+      // Legacy-Fallback: altes Format mit sheetSettings
+      const legacySheet = project.sheetSettings || defaultSheetConfig;
+      loadedSheets = [{ id: makeId(), name: 'Sheet 1', ...legacySheet }];
+      loadedActiveSheetId = loadedSheets[0].id;
+    }
+
     const normalizedItems = project.items.map((item) => ({
       ...item,
       groupKey: item.groupKey || item.src,
       originalWidth: item.originalWidth || item.width,
       originalHeight: item.originalHeight || item.height,
+      sheetId: item.sheetId || loadedActiveSheetId, // Legacy-Fallback: alle Items auf aktives Sheet
     }));
     const loadedImages = await Promise.all(
       normalizedItems.map(async (item) => [item.id, await loadImage(item.src)]),
     );
-    setSettings(project.sheetSettings || initialSettings);
+    setSheets(loadedSheets);
+    setActiveSheetId(loadedActiveSheetId);
     setItems(normalizedItems);
     setImages(new Map(loadedImages));
     setSheetTemplate(project.sheetTemplate || 'custom');
@@ -451,7 +618,7 @@ export default function App() {
 
   const restoreAutosave = async () => {
     try {
-      const autosave = loadAutosave();
+      const autosave = await loadAutosave();
       if (!autosave?.project) {
         setStatus('Kein Autosave gefunden.');
         return;
@@ -463,9 +630,13 @@ export default function App() {
     }
   };
 
-  const removeAutosave = () => {
-    clearAutosave();
-    setStatus('Autosave geloescht.');
+  const removeAutosave = async () => {
+    try {
+      await clearAutosave();
+      setStatus('Autosave gelöscht.');
+    } catch (error) {
+      setStatus(`Autosave konnte nicht gelöscht werden: ${error.message}`);
+    }
   };
 
   const undo = useCallback(() => {
@@ -538,15 +709,15 @@ export default function App() {
   }, [addImageItems]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
+    const timeout = window.setTimeout(async () => {
       try {
-        saveAutosave(makeProjectPayload());
-      } catch {
-        setStatus('Autosave konnte nicht gespeichert werden. Browser-Speicher ist moeglicherweise voll.');
+        await saveAutosave(makeProjectPayload());
+      } catch (error) {
+        setStatus(`Autosave konnte nicht gespeichert werden: ${error.message}`);
       }
     }, 600);
     return () => window.clearTimeout(timeout);
-  }, [items, settings, pricingValues, consumptionValues, gapMm, allowPackingRotation, sortPackingBySize, guideSettings, darkMode]);
+  }, [items, sheets, activeSheetId, pricingValues, consumptionValues, gapMm, allowPackingRotation, sortPackingBySize, guideSettings, darkMode]);
 
   return (
     <main className="app">
@@ -571,7 +742,7 @@ export default function App() {
             onClearAutosave={removeAutosave}
           />
           <TemplateSelector value={sheetTemplate} onChange={applyTemplate} />
-          <SheetSettings settings={settings} sheetPixels={sheet} onChange={updateSettings} />
+          <SheetSettings settings={activeSheet} sheetPixels={sheet} onChange={updateActiveSheet} />
           <ExportSafetyPanel stats={exportStats} />
           <PlacementWarnings
             result={placementResult}
@@ -581,6 +752,16 @@ export default function App() {
         </aside>
 
         <section className="editor-column">
+          {sheets.length > 0 && (
+            <SheetTabs
+              sheets={sheets}
+              activeId={activeSheetId}
+              onSelect={setActiveSheetId}
+              onAdd={addSheet}
+              onDelete={deleteSheet}
+              onRename={renameSheet}
+            />
+          )}
           <Toolbar
             gapMm={gapMm}
             onGapChange={setGapMm}
@@ -594,7 +775,7 @@ export default function App() {
             onGuideSettingsChange={updateGuideSettings}
           />
           <CanvasEditor
-            items={items}
+            items={sheetItems}
             images={images}
             selectedIds={selectedIds}
             sheet={sheet}
@@ -613,13 +794,14 @@ export default function App() {
         <aside className="side-column">
           <MotifList
             groups={motifGroups}
-            sheetDpi={settings.dpi}
+            sheetDpi={activeSheet.dpi}
             selectedId={selectedId}
             onSelect={(id) => selectItem(id)}
             onDuplicate={duplicateItem}
             onDelete={deleteItem}
             onDeleteGroup={deleteGroup}
             onQuantityChange={changeGroupQuantity}
+            onTrimGroup={trimGroup}
           />
           <MultiSelectPanel
             selectedCount={selectedIds.length}
@@ -639,21 +821,23 @@ export default function App() {
             onUpdateSelected={updateSelected}
             onUpdateSelectedSizeCm={updateSelectedSizeCm}
             onExportPng={exportPng}
+            onExportAllPng={exportAllPng}
+            sheetsCount={sheets.length}
             onExportZip={exportZip}
             onSaveProject={saveProject}
             guideSettings={guideSettings}
             onGuideSettingsChange={updateGuideSettings}
           />
           <PricingPanel
-            items={items}
+            items={sheetItems}
             groups={motifGroups}
-            sheet={settings}
+            sheet={activeSheet}
             values={pricingValues}
             onChange={(patch) => setPricingValues((current) => ({ ...current, ...patch }))}
           />
           <ConsumptionPanel
-            sheet={settings}
-            items={items}
+            sheet={activeSheet}
+            items={sheetItems}
             values={consumptionValues}
             onChange={(patch) => setConsumptionValues((current) => ({ ...current, ...patch }))}
           />
