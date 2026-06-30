@@ -34,9 +34,6 @@ Alles laeuft lokal im Browser, ohne Backend, externe Uploads, Datenbank oder API
 - Autosave im Browser mit Wiederherstellen- und Loeschen-Button
 - Dark Mode mit Speicherung in `localStorage`
 
-## Repository-Hygiene
-
-`dist/`, `node_modules/`, `outputs/`, `work/` und lokale ZIP-Exporte werden per `.gitignore` ignoriert. Diese Ordner sind nicht fuer Commits gedacht; gebaut wird lokal ueber Vite.
 
 ## Installation
 
