@@ -1,12 +1,16 @@
-export function createProjectPayload(sheetSettings, items) {
+export function createProjectPayload(sheetSettings, items, extras = {}) {
   return {
-    version: 1,
+    version: 2,
     savedAt: new Date().toISOString(),
     sheetSettings,
+    ...extras,
     items: items.map((item) => ({
       id: item.id,
+      groupKey: item.groupKey,
       name: item.name,
       src: item.src,
+      originalWidth: item.originalWidth,
+      originalHeight: item.originalHeight,
       width: item.width,
       height: item.height,
       x: item.x,
@@ -36,7 +40,7 @@ export function readProjectFile(file) {
     reader.onload = () => {
       try {
         const project = JSON.parse(reader.result);
-        if (!project || project.version !== 1 || !Array.isArray(project.items)) {
+        if (!project || ![1, 2].includes(project.version) || !Array.isArray(project.items)) {
           reject(new Error('Die Projektdatei ist nicht kompatibel.'));
           return;
         }

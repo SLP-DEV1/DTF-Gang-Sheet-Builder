@@ -5,4 +5,9 @@ export default defineConfig({
   // Relative asset paths work both locally and on GitHub Pages project sites.
   base: './',
   plugins: [react()],
+  server: {
+    watch: {
+      ignored: ['**/node_modules/**', '**/dist/**', '**/outputs/**', '**/work/**', '**/*.zip'],
+    },
+  },
 });
