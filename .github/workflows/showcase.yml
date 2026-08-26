@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   capture-showcase:
@@ -60,6 +60,19 @@ jobs:
 
       - name: Capture showcase
         run: node scripts/capture-showcase.mjs
+
+      - name: Commit refreshed screenshot
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add showcase/dtf-gang-sheet-builder.png
+          if git diff --cached --quiet; then
+            echo "Showcase image is already up to date."
+            exit 0
+          fi
+          git commit -m "docs: refresh README showcase"
+          git push
 
       - name: Upload screenshot
         uses: actions/upload-artifact@v4
