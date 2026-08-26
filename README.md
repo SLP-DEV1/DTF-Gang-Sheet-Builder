@@ -16,6 +16,8 @@ A free, open-source **DTF (Direct-to-Film) gang sheet builder** that runs entire
 
 *Real app screenshot generated from the project build: A4 sheet, six motifs, Auto Arrange, 5 mm spacing and gap guides. Click the screenshot to open the live demo.*
 
+<!-- The showcase image can be reproduced with the manual Refresh README showcase workflow. -->
+
 > The current application UI is German. The repository documentation is English-first so the project is easier to discover and contribute to internationally.
 
 ## Why this project?
