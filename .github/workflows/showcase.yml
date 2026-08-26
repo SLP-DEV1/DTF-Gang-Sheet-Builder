@@ -23,8 +23,14 @@ jobs:
       - name: Install app dependencies
         run: npm ci
 
-      - name: Install Playwright core
-        run: npm install --no-save --package-lock=false playwright-core@1.55.0
+      - name: Install capture tooling
+        shell: bash
+        run: |
+          npm install --no-save --package-lock=false playwright-core@1.55.0
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
 
       - name: Resolve Chrome
         shell: bash
@@ -52,25 +58,30 @@ jobs:
           cat /tmp/dtf-preview.log
           exit 1
 
-      - name: Capture showcase
+      - name: Capture screenshot
         run: node scripts/capture-showcase.mjs
 
-      - name: Commit refreshed screenshot
+      - name: Capture demo GIF
+        run: node scripts/capture-demo-gif.mjs
+
+      - name: Commit refreshed showcase assets
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add showcase/dtf-gang-sheet-builder.png
+          git add showcase/dtf-gang-sheet-builder.png showcase/dtf-gang-sheet-demo.gif
           if git diff --cached --quiet; then
-            echo "Showcase image is already up to date."
+            echo "Showcase assets are already up to date."
             exit 0
           fi
           git commit -m "docs: refresh README showcase"
           git push
 
-      - name: Upload screenshot
+      - name: Upload showcase assets
         uses: actions/upload-artifact@v4
         with:
           name: README-showcase
-          path: showcase/dtf-gang-sheet-builder.png
+          path: |
+            showcase/dtf-gang-sheet-builder.png
+            showcase/dtf-gang-sheet-demo.gif
           if-no-files-found: error
