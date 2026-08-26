@@ -1,145 +1,107 @@
 # DTF Gang Sheet Builder
 
+[![CI](https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder/actions/workflows/ci.yml/badge.svg)](https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder/actions/workflows/deploy.yml/badge.svg)](https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder/actions/workflows/deploy.yml)
-![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![Built with React](https://img.shields.io/badge/React-18-blue.svg)
-![Vite](https://img.shields.io/badge/Vite-6-646CFF.svg)
+![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
+![Local first](https://img.shields.io/badge/privacy-local--first-success.svg)
+![React](https://img.shields.io/badge/React-18-61DAFB.svg)
 
-Kostenloser, browserbasierter **DTF Gang Sheet Builder** zum Anordnen transparenter PNG-Motive und Exportieren druckfertiger Gang-Sheets.
+A free, open-source **DTF (Direct-to-Film) gang sheet builder** that runs entirely in your browser. Arrange transparent PNG designs, auto-pack them across one or more sheets, check print quality and spacing, estimate costs, and export print-ready PNG/ZIP files.
 
-Die App läuft vollständig lokal im Browser. Es gibt keinen Server-Upload, keine Datenbank, keinen Login und keine API-Keys.
+**No account. No upload server. No API key. Your artwork stays in your browser.**
 
-## Live Demo
+[![Open Live Demo](https://img.shields.io/badge/Open-Live_Demo-1f6feb?style=for-the-badge)](https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/)
 
-```text
-https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/
-```
+> The current application UI is German. The repository documentation is English-first so the project is easier to discover and contribute to internationally.
+
+## Why this project?
+
+Most gang-sheet tools are tied to a store, SaaS account, subscription, or upload workflow. This project is intentionally different: it is a lightweight local-first tool that a small print shop, creator, or hobby printer can open and use immediately.
+
+It is useful for:
+
+- DTF print shops preparing roll layouts
+- creators producing transfers in-house
+- small businesses that want a private offline-style workflow
+- developers looking for an open-source React/Konva print-layout project
 
 ## Highlights
 
-- PNG Upload mit mehreren Dateien, Drag & Drop und Clipboard-Paste
-- Transparente Motive verschieben, skalieren, drehen, duplizieren und löschen
-- Motivgröße direkt in Zentimetern bearbeiten
-- Größen-Presets für Brust, Rücken, Ärmel, Kinder-Shirt und A4-Breite
-- Auto Arrange mit Größensortierung und optionaler 90° Rotation
-- Automatische Verteilung auf mehrere Sheets, wenn nicht alles auf ein Sheet passt
-- Multi-Sheet Tabs mit Umbenennen, Löschen und neuen Sheet-Vorlagen
-- Vorlagen für 56 cm Rolle, 60 cm Rolle, A4, A3 und Custom
-- DPI-/Qualitätswarnung pro Motiv
-- Transparenz-Trimming pro Motivgruppe
-- Kollisions-, Rand-, Überlappungs- und Mindestabstandsprüfung
-- Schneidelinien und Abstandslinien optional im Canvas und Export
-- Preisrechner mit Arbeitszeit, Stundensatz, Marge und Mindestpreis
-- Verbrauchsrechner für Folie, Pulver und Tinte
-- Export-Sicherheitsanzeige mit Pixelgröße, Megapixeln und geschätztem RAM-Verbrauch
-- PNG-Export mit 300-DPI-Metadaten
-- ZIP-Export mit PNG-Dateien, `project.json`, `summary.json` und `summary.txt`
-- Projektdatei als JSON speichern und später wieder laden
-- IndexedDB-Autosave mit Wiederherstellen- und Löschen-Button
-- Dark Mode
-- White-Underbase-Vorschau als reine Anzeigehilfe
+| Area | What it can do |
+| --- | --- |
+| Artwork | Multi-PNG upload, drag & drop, clipboard paste, duplicate, delete and transparency trimming |
+| Layout | Move, scale, rotate, multi-select, alignment and configurable spacing |
+| Auto arrange | Size sorting, optional 90° rotation and automatic distribution across multiple sheets |
+| Sheet presets | 56 cm roll, 60 cm roll, A4, A3 and custom sizes |
+| Preflight | Effective-DPI warnings, edge checks, overlaps, collisions and minimum-gap checks |
+| Production | Optional cut/gap guides, 300-DPI PNG metadata and multi-sheet ZIP export |
+| Costing | Material/area pricing, labor, hourly rate, margin and minimum price |
+| Consumption | Film length, powder and ink estimates based on occupied artwork area |
+| Projects | JSON save/load plus local IndexedDB autosave and restore |
+| Privacy | Artwork is processed locally in the browser; no login, database or API keys |
 
-## Wofür ist das Tool gedacht?
+## Quick workflow
 
-Der Builder ist für kleine DTF-Druckshops, Creator und Hobbydrucker gedacht, die PNG-Motive schnell und platzsparend auf einer Druckfläche vorbereiten möchten.
+1. Open the [live demo](https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/).
+2. Drop in transparent PNG designs.
+3. Select a roll/sheet preset or enter a custom size.
+4. Set quantities and physical print sizes in centimeters.
+5. Run **Auto Arrange**.
+6. Review DPI, spacing and placement warnings.
+7. Export a PNG, all sheets as PNGs, or a ZIP project package.
 
-Typische Workflows:
+## Export format
 
-1. Motive als transparente PNGs hochladen.
-2. Sheet-Breite und Sheet-Höhe festlegen.
-3. Stückzahlen pro Motivgruppe einstellen.
-4. Motive automatisch anordnen lassen.
-5. Platzierungswarnungen, Preis und Verbrauch prüfen.
-6. Als PNG oder ZIP exportieren.
-
-## Datenschutz
-
-Alle Dateien bleiben lokal im Browser des Nutzers.
-
-Die App:
-
-- lädt keine Motive auf einen Server hoch
-- verwendet keine Datenbank
-- nutzt keine API-Keys
-- speichert keine persönlichen Daten extern
-- funktioniert ohne Login
-
-Autosave wird lokal im Browser über IndexedDB gespeichert und kann jederzeit gelöscht werden.
-
-## Installation
-
-```bash
-git clone https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder.git
-cd DTF-Gang-Sheet-Builder
-npm install
-npm run dev
-```
-
-Danach die angezeigte Vite-Adresse öffnen, zum Beispiel:
+A ZIP export contains the rendered sheet PNG files plus project and production summaries:
 
 ```text
-http://localhost:5173/
-```
-
-## Production Build
-
-```bash
-npm run build
-npm run preview
-```
-
-Der Build erzeugt den Ordner `dist/`. Dieser Ordner wird nicht ins Repository committed, sondern bei GitHub Pages automatisch neu gebaut.
-
-## GitHub Pages Deployment
-
-Das Projekt enthält bereits einen Workflow unter:
-
-```text
-.github/workflows/deploy.yml
-```
-
-Einrichtung:
-
-1. Repository auf GitHub öffnen.
-2. **Settings → Pages** öffnen.
-3. Bei **Build and deployment** als Source **GitHub Actions** auswählen.
-4. Eine Änderung auf `main` pushen oder den Workflow manuell starten.
-
-Die Vite-Konfiguration nutzt `base: './'`, damit Assets auch unter einer GitHub-Pages-Projekt-URL korrekt geladen werden.
-
-## Projektdatei
-
-Die gespeicherte JSON-Datei enthält unter anderem:
-
-- Sheets und aktive Sheet-Auswahl
-- Motive, Positionen, Größen, Rotation und Bilddaten
-- Motivgruppen und Stückzahlen
-- Preis- und Verbrauchswerte
-- Hilfslinien- und Export-Einstellungen
-- Auto-Arrange-Einstellungen
-- Dark-Mode-Einstellung
-
-## Export
-
-Der ZIP-Export enthält:
-
-```text
-gang-sheet.png oder mehrere Sheet-PNGs
+01-sheet-name.png
+02-sheet-name.png
 project.json
 summary.json
 summary.txt
 ```
 
-Bei mehreren Sheets exportiert die App jedes Sheet als eigene PNG-Datei und legt alle Dateien gemeinsam ins ZIP.
+PNG exports include physical-resolution metadata for the configured DPI (300 DPI by default).
 
-## White-Underbase-Hinweis
+## Local-first privacy
 
-Die White-Underbase-Funktion ist nur eine Vorschau. Die echte Weißunterlegung und Separation macht normalerweise das RIP oder die DTF-Drucksoftware.
+Artwork is loaded with browser APIs and stored only in the current browser/project data. The application does not require a backend, account, database, analytics key or image-upload API.
 
-## Tech Stack
+Autosaves are stored locally in IndexedDB and can be removed from the UI at any time.
 
-- React
-- Vite
+## Install locally
+
+Requirements: **Node.js 22+** and npm.
+
+```bash
+git clone https://github.com/SLP-DEV1/DTF-Gang-Sheet-Builder.git
+cd DTF-Gang-Sheet-Builder
+npm ci
+npm run dev
+```
+
+Vite will print the local development URL, usually `http://localhost:5173/`.
+
+### Quality checks
+
+```bash
+npm test
+npm run build
+```
+
+Or run both:
+
+```bash
+npm run check
+```
+
+The test suite uses Node's built-in test runner, so no extra test framework is required.
+
+## Tech stack
+
+- React 18
+- Vite 6
 - Konva / react-konva
 - JSZip
 - FileSaver
@@ -147,23 +109,50 @@ Die White-Underbase-Funktion ist nur eine Vorschau. Die echte Weißunterlegung u
 - GitHub Actions
 - GitHub Pages
 
+Core calculations live in `src/lib/` so packing, geometry, placement, units, pricing and consumption logic can be tested separately from the React UI.
+
+## Current limitations
+
+- Input artwork is PNG-focused.
+- White-underbase display is a preview aid, not RIP separation.
+- The browser must hold export-sized canvases in memory; very large sheets can be memory intensive.
+- Auto-arrange is a practical shelf-packing strategy, not yet a true irregular alpha-shape nesting engine.
+
 ## Roadmap
 
-Mögliche nächste Schritte:
+See [ROADMAP.md](ROADMAP.md). High-value next steps include:
 
-- Lineal und Raster in cm/mm
-- Snap-to-grid und Snap an andere Motive
-- Zoom und Pan im Canvas
-- Echte Alpha-Silhouette für White-Underbase statt Bounding-Box-Vorschau
-- Bessere Nesting-Algorithmen
-- Mehr Exportprofile für unterschiedliche RIPs
-- Screenshot/GIF-Demo in der README
-- Kleine Test-Suite für cm/mm/DPI-/Preisberechnungen
+- zoom, pan, rulers and snapping
+- stronger nesting/packing strategies
+- additional print/RIP export profiles
+- more automated tests around project import/export
+- English/German UI localization
+- a short demo GIF or screenshot gallery
 
-## Mitmachen
+## Contributing
 
-Issues und Pull Requests sind willkommen. Bitte lies vorher [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports, feature ideas and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Lizenz
+If you are contributing code, please run:
 
-MIT License. Details stehen in [LICENSE](LICENSE).
+```bash
+npm run check
+```
+
+before opening a pull request.
+
+## Security
+
+Please do not publish sensitive security reports in a public issue. See [SECURITY.md](SECURITY.md).
+
+## Deutsche Kurzbeschreibung
+
+Der DTF Gang Sheet Builder ist ein kostenloses, browserbasiertes Tool zum Anordnen transparenter PNG-Motive auf DTF-Druckflächen. Motive können automatisch verteilt, auf mehrere Sheets aufgeteilt, auf DPI und Abstände geprüft sowie als PNG oder ZIP exportiert werden. Die Verarbeitung findet lokal im Browser statt.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
+
+---
+
+If this project saves you time in production, consider giving it a **star**. It helps other DTF makers and print shops discover the project.

@@ -1,6 +1,26 @@
 # Changelog
 
-Alle wichtigen Änderungen an diesem Projekt werden hier dokumentiert.
+All notable changes to this project are documented here.
+
+## [Unreleased]
+
+### Added
+
+- Pull-request CI for Node 22 with automated tests and production builds
+- Regression tests for packing, placement, unit conversion and consumption calculations
+- Dependabot configuration for npm and GitHub Actions updates
+- Pull request template and dedicated project roadmap
+- English-first project documentation and improved website metadata for discoverability
+
+### Fixed
+
+- Auto Arrange can no longer expand an earlier shelf into a later shelf and create overlapping placements
+- Empty sheets no longer report full-sheet powder and ink consumption when no artwork is present
+
+### Changed
+
+- Expanded package keywords for DTF, print-shop, prepress and local-first discovery
+- Contributing guide now documents the automated quality checks and local-first project conventions
 
 ## [0.2.0] - GitHub-ready Release
 
