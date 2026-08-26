@@ -1,0 +1,69 @@
+name: Capture README showcase
+
+on:
+  push:
+    branches:
+      - docs/showcase-screenshot
+    paths:
+      - scripts/capture-showcase.mjs
+      - .github/workflows/showcase.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture-showcase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install Playwright core
+        run: npm install --no-save --package-lock=false playwright-core@1.55.0
+
+      - name: Resolve Chrome
+        shell: bash
+        run: |
+          CHROME_PATH="$(command -v google-chrome-stable || command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_PATH" ]; then
+            echo "Chrome/Chromium is not available on this runner." >&2
+            exit 1
+          fi
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: npm run build
+
+      - name: Start preview
+        shell: bash
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/dtf-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/dtf-preview.log
+          exit 1
+
+      - name: Capture showcase
+        run: node scripts/capture-showcase.mjs
+
+      - name: Upload screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: README-showcase
+          path: showcase/dtf-gang-sheet-builder.png
+          if-no-files-found: error
