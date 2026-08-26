@@ -12,11 +12,17 @@ A free, open-source **DTF (Direct-to-Film) gang sheet builder** that runs entire
 
 [![Open Live Demo](https://img.shields.io/badge/Open-Live_Demo-1f6feb?style=for-the-badge)](https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/)
 
+## Quick Demo
+
+[![DTF Gang Sheet Builder demo: upload PNGs, run Auto Arrange, get a finished gang sheet](showcase/dtf-gang-sheet-demo.gif)](https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/)
+
+*Upload PNGs, click Auto Arrange, and get a finished print-ready gang sheet in seconds. Click the GIF to open the live demo.*
+
 [![DTF Gang Sheet Builder showing an A4 gang sheet after Auto Arrange](showcase/dtf-gang-sheet-builder.png)](https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/)
 
 *Real app screenshot generated from the project build: A4 sheet, six motifs, Auto Arrange, 5 mm spacing and gap guides. Click the screenshot to open the live demo.*
 
-<!-- The showcase image can be reproduced with the manual Refresh README showcase workflow. -->
+<!-- The screenshot and animated demo can be reproduced with the manual Refresh README showcase workflow. -->
 
 > The current application UI is German. The repository documentation is English-first so the project is easier to discover and contribute to internationally.
 
@@ -133,7 +139,7 @@ See [ROADMAP.md](ROADMAP.md). High-value next steps include:
 - additional print/RIP export profiles
 - more automated tests around project import/export
 - English/German UI localization
-- a short before/after Auto Arrange demo GIF
+- performance improvements for very large roll exports
 
 ## Contributing
 
