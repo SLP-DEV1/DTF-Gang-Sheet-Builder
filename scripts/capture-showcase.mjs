@@ -65,7 +65,7 @@ await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
 
 const upload = page.locator('input[type="file"][accept="image/png"]');
 await upload.setInputFiles(artworkPaths);
-await page.getByText('demo-1.png').waitFor({ timeout: 10_000 });
+await page.locator('strong').filter({ hasText: 'demo-1.png' }).first().waitFor({ timeout: 10_000 });
 
 const gapInput = page.getByLabel('Abstand mm');
 await gapInput.fill('6');
