@@ -43,7 +43,7 @@ for (const [index, artwork] of demoArtwork.entries()) {
     <!doctype html>
     <html>
       <body style="margin:0;background:transparent">
-        <svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+        <svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 480 320">
           <rect x="20" y="20" width="440" height="280" rx="44" fill="rgba(255,255,255,.96)" stroke="${artwork.accent}" stroke-width="10"/>
           <rect x="42" y="42" width="396" height="64" rx="26" fill="${artwork.accent}"/>
           <circle cx="410" cy="151" r="20" fill="${artwork.soft}"/>
@@ -67,13 +67,20 @@ const upload = page.locator('input[type="file"][accept="image/png"]');
 await upload.setInputFiles(artworkPaths);
 await page.locator('strong').filter({ hasText: 'demo-1.png' }).first().waitFor({ timeout: 10_000 });
 
+await page.getByLabel('Sheet-Vorlage').selectOption('a4');
+
+const quantityInputs = page.locator('.motif-card input[type="number"]');
+for (let index = 0; index < 3; index += 1) {
+  await quantityInputs.nth(index).fill('2');
+}
+
 const gapInput = page.getByLabel('Abstand mm');
-await gapInput.fill('6');
+await gapInput.fill('5');
 await page.getByLabel('Rotation erlauben').check();
 await page.getByRole('button', { name: 'Auto Arrange' }).click();
 await page.getByLabel('Abstandslinien').check();
 
-await page.waitForTimeout(800);
+await page.waitForTimeout(900);
 await page.evaluate(() => window.scrollTo(0, 0));
 
 await page.screenshot({
