@@ -1,12 +1,6 @@
-name: Capture README showcase
+name: Refresh README showcase
 
 on:
-  push:
-    branches:
-      - docs/showcase-screenshot
-    paths:
-      - scripts/capture-showcase.mjs
-      - .github/workflows/showcase.yml
   workflow_dispatch:
 
 permissions:
