@@ -2,12 +2,6 @@ name: Refresh README showcase
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - docs/add-demo-gif
-    paths:
-      - scripts/capture-demo-gif.mjs
-      - .github/workflows/showcase.yml
 
 permissions:
   contents: write
@@ -64,25 +58,30 @@ jobs:
           cat /tmp/dtf-preview.log
           exit 1
 
+      - name: Capture screenshot
+        run: node scripts/capture-showcase.mjs
+
       - name: Capture demo GIF
         run: node scripts/capture-demo-gif.mjs
 
-      - name: Commit refreshed demo GIF
+      - name: Commit refreshed showcase assets
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add showcase/dtf-gang-sheet-demo.gif
+          git add showcase/dtf-gang-sheet-builder.png showcase/dtf-gang-sheet-demo.gif
           if git diff --cached --quiet; then
-            echo "Demo GIF is already up to date."
+            echo "Showcase assets are already up to date."
             exit 0
           fi
-          git commit -m "docs: refresh README demo GIF"
+          git commit -m "docs: refresh README showcase"
           git push
 
-      - name: Upload demo GIF
+      - name: Upload showcase assets
         uses: actions/upload-artifact@v4
         with:
-          name: README-demo-gif
-          path: showcase/dtf-gang-sheet-demo.gif
+          name: README-showcase
+          path: |
+            showcase/dtf-gang-sheet-builder.png
+            showcase/dtf-gang-sheet-demo.gif
           if-no-files-found: error
