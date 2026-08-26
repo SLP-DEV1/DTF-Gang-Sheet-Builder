@@ -3,7 +3,7 @@
   "private": false,
   "version": "0.2.0",
   "type": "module",
-  "description": "Free browser-based DTF gang sheet builder for arranging transparent PNG designs and exporting print-ready gang sheets.",
+  "description": "Free local-first DTF gang sheet builder for arranging transparent PNG designs and exporting print-ready sheets.",
   "homepage": "https://slp-dev1.github.io/DTF-Gang-Sheet-Builder/",
   "repository": {
     "type": "git",
@@ -15,19 +15,26 @@
   "license": "MIT",
   "keywords": [
     "dtf",
+    "dtf-printing",
+    "direct-to-film",
     "gang-sheet",
-    "print",
+    "gang-sheet-builder",
+    "print-shop",
+    "prepress",
+    "nesting",
+    "heat-transfer",
     "png",
     "canvas",
+    "local-first",
     "react",
-    "vite",
-    "konva",
-    "transfer-printing"
+    "konva"
   ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test",
+    "check": "npm test && npm run build"
   },
   "dependencies": {
     "file-saver": "^2.0.5",

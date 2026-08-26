@@ -10,7 +10,7 @@ export function calculateConsumption({ sheet, values, items = [] }) {
   const heightCm = numberOrZero(sheet.heightCm);
   const sheetAreaM2 = (widthCm * heightCm) / 10000;
   const occupiedAreaM2 = calculateOccupiedAreaCm2(items, sheet.dpi) / 10000;
-  const printAreaM2 = occupiedAreaM2 || sheetAreaM2;
+  const printAreaM2 = occupiedAreaM2;
   const lengthM = heightCm / 100;
   const rollWidthCm = numberOrZero(values.rollWidthCm) || widthCm;
 

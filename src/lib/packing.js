@@ -78,11 +78,17 @@ function findPlacement(variants, shelves, sheet, gap) {
 
   shelves.forEach((shelf) => {
     variants.forEach((variant) => {
+      const candidateHeight = Math.max(shelf.height, variant.height);
+      const nextShelfY = shelves.reduce(
+        (nearest, otherShelf) => otherShelf.y > shelf.y ? Math.min(nearest, otherShelf.y) : nearest,
+        Infinity,
+      );
       const fitsWidth = shelf.cursorX + variant.width + gap <= sheet.widthPx;
-      const fitsHeight = shelf.y + Math.max(shelf.height, variant.height) + gap <= sheet.heightPx;
-      if (!fitsWidth || !fitsHeight) return;
+      const fitsHeight = shelf.y + candidateHeight + gap <= sheet.heightPx;
+      const clearsNextShelf = nextShelfY === Infinity || shelf.y + candidateHeight + gap <= nextShelfY;
+      if (!fitsWidth || !fitsHeight || !clearsNextShelf) return;
 
-      const wastedHeight = Math.max(shelf.height, variant.height) - variant.height;
+      const wastedHeight = candidateHeight - variant.height;
       const score = shelf.y * 100000 + shelf.cursorX + wastedHeight;
       if (!best || score < best.score) {
         best = { ...variant, x: shelf.cursorX, y: shelf.y, shelf, score };
